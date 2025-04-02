@@ -1,5 +1,5 @@
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse 
 from typing import List, Optional, Dict
 import tempfile
 import os
@@ -19,6 +19,40 @@ data_dir = Path(__file__).parent.parent.parent / "data"
 output_dir = data_dir / "output"
 output_dir.mkdir(exist_ok=True, parents=True)
 
+@app.get("/", response_class=HTMLResponse)
+async def root():
+    """
+    Root endpoint that provides basic information about the API.
+    """
+    return """
+    <html>
+        <head>
+            <title>Resume Inspector API</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+                h1 { color: #333; }
+                .endpoint { background: #f4f4f4; padding: 10px; margin-bottom: 10px; border-radius: 5px; }
+                code { background: #eee; padding: 2px 5px; border-radius: 3px; }
+            </style>
+        </head>
+        <body>
+            <h1>Resume Inspector API</h1>
+            <p>Welcome to the Resume Inspector API. Use the following endpoints:</p>
+            
+            <div class="endpoint">
+                <strong>POST /process-resume</strong>
+                <p>Upload and process a resume file against specified skills.</p>
+            </div>
+            
+            <div class="endpoint">
+                <strong>GET /download/{filename}</strong>
+                <p>Download a processed resume file.</p>
+            </div>
+            
+            <p>For API documentation, visit <a href="/docs">/docs</a></p>
+        </body>
+    </html>
+    """
 @app.post("/process-resume")
 async def process_resume(
     resume_file: UploadFile = File(...),
